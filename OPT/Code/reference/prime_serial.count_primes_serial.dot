@@ -1,0 +1,11 @@
+digraph "CFG for 'count_primes_serial' function" {
+	label="CFG for 'count_primes_serial' function";
+
+	Node0x562dd97da300 [shape=record,label="{entry:\l|  %cmp.not4 = icmp slt i32 %limit, 2\l  br i1 %cmp.not4, label %for.cond.cleanup, label %for.body\l|{<s0>T|<s1>F}}"];
+	Node0x562dd97da300:s0 -> Node0x562dd97da470[tooltip="entry -> for.cond.cleanup\nProbability 50.00%" ];
+	Node0x562dd97da300:s1 -> Node0x562dd97da4f0[tooltip="entry -> for.body\nProbability 50.00%" ];
+	Node0x562dd97da470 [shape=record,label="{for.cond.cleanup:\l|  %count.0.lcssa = phi i32 [ 0, %entry ], [ %add, %for.body ]\l  ret i32 %count.0.lcssa\l}"];
+	Node0x562dd97da4f0 [shape=record,label="{for.body:\l|  %value.06 = phi i32 [ %inc, %for.body ], [ 2, %entry ]\l  %count.05 = phi i32 [ %add, %for.body ], [ 0, %entry ]\l  %call = tail call i32 @is_prime(i32 noundef %value.06), !range !6\l  %add = add nuw nsw i32 %call, %count.05\l  %inc = add nuw i32 %value.06, 1\l  %exitcond.not = icmp eq i32 %value.06, %limit\l  br i1 %exitcond.not, label %for.cond.cleanup, label %for.body, !llvm.loop !7\l|{<s0>T|<s1>F}}"];
+	Node0x562dd97da4f0:s0 -> Node0x562dd97da470[tooltip="for.body -> for.cond.cleanup\nProbability 3.12%" ];
+	Node0x562dd97da4f0:s1 -> Node0x562dd97da4f0[tooltip="for.body -> for.body\nProbability 96.88%" ];
+}

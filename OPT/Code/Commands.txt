@@ -1,0 +1,27 @@
+sudo apt-get update
+sudo apt-get install -y build-essential flex bison clang-18 llvm-18 libomp-18-dev graphviz unzip
+cd Code
+mkdir -p build
+bison -Wall -Werror -d -o build/parser.tab.c quectoc/parser.y
+flex -o build/lex.yy.c quectoc/scanner.l
+gcc -std=c11 -Wall -Wextra -Werror -pedantic -g -D_POSIX_C_SOURCE=200809L -Iquectoc -Ibuild quectoc/ast.c quectoc/ast_dot.c quectoc/semantic.c quectoc/semantic_dot.c quectoc/codegen.c quectoc/main.c build/parser.tab.c build/lex.yy.c -o build/quectoc
+./build/quectoc --emit-llvm examples/squares.qc > build/squares.raw.ll
+./build/quectoc --emit-llvm examples/squares_unrolled2.qc > build/manual.raw.ll
+opt-18 -passes=verify -disable-output build/squares.raw.ll
+opt-18 -passes=verify -disable-output build/manual.raw.ll
+lli-18 build/squares.raw.ll
+lli-18 build/manual.raw.ll
+opt-18 -S -passes="mem2reg,loop-simplify,lcssa" build/squares.raw.ll -o build/squares.ssa.ll
+opt-18 -S -passes=loop-unroll -unroll-count=2 -unroll-allow-partial -pass-remarks=loop-unroll build/squares.ssa.ll -o build/squares.unrolled.ll
+opt-18 -passes=verify -disable-output build/squares.unrolled.ll
+lli-18 build/squares.unrolled.ll
+opt-18 -passes=dot-cfg -cfg-heat-colors=false -disable-output -cfg-func-name=main -cfg-dot-filename-prefix=build/original build/squares.ssa.ll
+dot -Tsvg build/original.main.dot -o build/original.cfg.svg
+opt-18 -passes=dot-cfg -cfg-heat-colors=false -disable-output -cfg-func-name=main -cfg-dot-filename-prefix=build/unrolled build/squares.unrolled.ll
+dot -Tsvg build/unrolled.main.dot -o build/unrolled.cfg.svg
+llc-18 -O2 -mtriple=x86_64-pc-linux-gnu -mcpu=x86-64 -relocation-model=pic -x86-asm-syntax=intel -filetype=asm build/squares.ssa.ll -o build/squares.ssa.s
+llc-18 -O2 -mtriple=x86_64-pc-linux-gnu -mcpu=x86-64 -relocation-model=pic -x86-asm-syntax=intel -filetype=asm build/squares.unrolled.ll -o build/squares.unrolled.s
+gcc build/squares.ssa.s -o build/squares_original
+gcc build/squares.unrolled.s -o build/squares_unrolled
+./build/squares_original
+./build/squares_unrolled

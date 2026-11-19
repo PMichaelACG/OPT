@@ -1,0 +1,12 @@
+digraph "CFG for 'main' function" {
+	label="CFG for 'main' function";
+
+	Node0x560114ed3fb0 [shape=record,label="{entry:\l|  br label %while.cond.1\l}"];
+	Node0x560114ed3fb0 -> Node0x560114ed4160[tooltip="entry -> while.cond.1\nProbability 100.00%" ];
+	Node0x560114ed4160 [shape=record,label="{while.cond.1:\l|  %v6.0 = phi i32 [ 0, %entry ], [ %t10, %while.body.1 ]\l  %v9.0 = phi i32 [ 0, %entry ], [ %t8, %while.body.1 ]\l  %t3 = icmp slt i32 %v6.0, 7\l  br i1 %t3, label %while.body.1, label %while.end.1\l|{<s0>T|<s1>F}}"];
+	Node0x560114ed4160:s0 -> Node0x560114ed46e0[tooltip="while.cond.1 -> while.body.1\nProbability 96.88%" ];
+	Node0x560114ed4160:s1 -> Node0x560114ed5090[tooltip="while.cond.1 -> while.end.1\nProbability 3.12%" ];
+	Node0x560114ed46e0 [shape=record,label="{while.body.1:\l|  %t7 = mul i32 %v6.0, %v6.0\l  %t8 = add i32 %v9.0, %t7\l  %t10 = add i32 %v6.0, 1\l  br label %while.cond.1\l}"];
+	Node0x560114ed46e0 -> Node0x560114ed4160[tooltip="while.body.1 -> while.cond.1\nProbability 100.00%" ];
+	Node0x560114ed5090 [shape=record,label="{while.end.1:\l|  %v9.0.lcssa = phi i32 [ %v9.0, %while.cond.1 ]\l  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.int, i32 %v9.0.lcssa)\l  ret i32 0\l}"];
+}
